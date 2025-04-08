@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1046381078438",
+    "project_id": "shopware-47761",
+    "storage_bucket": "shopware-47761.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046381078438:android:6295cbadbab15cf1d0d167",
+        "android_client_info": {
+          "package_name": "com.example.shopware"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChsFC_k1S_kX6OpQZFmW1bAh0WJFjzK_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
