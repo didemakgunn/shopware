@@ -49,7 +49,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     };
 
     if (widget.productId != null) {
-      // güncelle
       await _firestore
           .collection('products')
           .doc(widget.productId)
@@ -57,13 +56,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Ürün güncellendi')));
     } else {
-      // yeni ürün ekle
       await _firestore.collection('products').add(productData);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Ürün eklendi')));
     }
 
-    Navigator.pop(context); // geri dön
+    Navigator.pop(context);
   }
 
   @override

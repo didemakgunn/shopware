@@ -115,21 +115,62 @@ class _CartScreenState extends State<CartScreen> {
               ),
               ElevatedButton(
                 onPressed: () async {
+                  if (uid == null) return;
+
                   final cartRef = _firestore
                       .collection('users')
                       .doc(uid)
                       .collection('cart');
+                  final orderRef = _firestore
+                      .collection('users')
+                      .doc(uid)
+                      .collection('orders');
+
                   final cartItems = await cartRef.get();
 
-                  for (var doc in cartItems.docs) {
-                    await doc.reference.delete();
+                  if (cartItems.docs.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text('Sepetiniz boş, sipariş oluşturulamadı ❌')),
+                    );
+                    return;
                   }
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text(
-                            'Satın alma işlemi başarılı. Sepet temizlendi ✅')),
-                  );
+                  List<Map<String, dynamic>> orderItems = [];
+
+                  for (var doc in cartItems.docs) {
+                    final data = doc.data();
+                    orderItems.add({
+                      'name': data['name'],
+                      'price': data['price'],
+                      'quantity': data['quantity'],
+                      'imageUrl': data['imageUrl'],
+                    });
+                  }
+
+                  try {
+                    await orderRef.add({
+                      'createdAt': FieldValue.serverTimestamp(),
+                      'items': orderItems,
+                    });
+
+                    for (var doc in cartItems.docs) {
+                      await doc.reference.delete();
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Sipariş başarıyla oluşturuldu ✅')),
+                    );
+                  } catch (e) {
+                    print('Sipariş hatası: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text('Sipariş oluşturulurken hata oluştu ❌')),
+                    );
+                  }
                 },
                 child: Text('Satın Al'),
               ),

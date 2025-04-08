@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopware/firebase_options.dart';
 import 'screens/login_screen.dart';
@@ -7,6 +8,7 @@ import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('tr_TR');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

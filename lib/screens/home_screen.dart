@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopware/screens/cart_screen.dart';
 import 'package:shopware/screens/favorite_products_screen.dart';
+import 'package:shopware/screens/order_history_screen.dart';
 import 'package:shopware/screens/product_screen.dart';
 
 import 'login_screen.dart';
@@ -133,6 +134,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               child: Text('Sepetim'),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => OrderHistoryScreen()),
+                );
+              },
+              child: Text('Siparişlerim'),
             ),
           ],
         ),
