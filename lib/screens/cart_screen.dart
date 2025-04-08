@@ -14,7 +14,6 @@ class _CartScreenState extends State<CartScreen> {
   final _firestore = FirebaseFirestore.instance;
 
   String? uid;
-  double _total = 0;
 
   @override
   void initState() {
@@ -45,8 +44,9 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (uid == null)
-      return Scaffold(body: Center(child: Text('Kullanıcı yok')));
+    if (uid == null) {
+      return Scaffold(body: Center(child: Text('Kullanıcı girişi yapılmamış')));
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text('Sepetim')),
@@ -64,7 +64,15 @@ class _CartScreenState extends State<CartScreen> {
 
           if (docs.isEmpty) return Center(child: Text('Sepetiniz boş.'));
 
-          double total = 0;
+          final total = docs.fold<double>(
+            0,
+            (sum, doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              final quantity = data['quantity'] ?? 1;
+              final price = data['price'] ?? 0;
+              return sum + (price * quantity);
+            },
+          );
 
           return Column(
             children: [
@@ -74,9 +82,6 @@ class _CartScreenState extends State<CartScreen> {
                   itemBuilder: (context, index) {
                     final doc = docs[index];
                     final data = doc.data() as Map<String, dynamic>;
-                    final price =
-                        (data['price'] ?? 0) * (data['quantity'] ?? 1);
-                    total += price;
 
                     return ListTile(
                       leading: Image.network(data['imageUrl'],
@@ -109,9 +114,21 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final cartRef = _firestore
+                      .collection('users')
+                      .doc(uid)
+                      .collection('cart');
+                  final cartItems = await cartRef.get();
+
+                  for (var doc in cartItems.docs) {
+                    await doc.reference.delete();
+                  }
+
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Satın alma işlemi simüle edildi')),
+                    SnackBar(
+                        content: Text(
+                            'Satın alma işlemi başarılı. Sepet temizlendi ✅')),
                   );
                 },
                 child: Text('Satın Al'),
