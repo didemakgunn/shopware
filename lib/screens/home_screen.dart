@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shopware/screens/admin_order_panel.dart';
 import 'package:shopware/screens/cart_screen.dart';
 import 'package:shopware/screens/favorite_products_screen.dart';
 import 'package:shopware/screens/order_history_screen.dart';
@@ -121,6 +122,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 child: Text('Admin Panel'),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => AdminOrderPanel()),
+                  );
+                },
+                child: Text('Sipariş Yönetimi'),
               ),
               SizedBox(
                 height: 20,
