@@ -42,10 +42,62 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  Future<void> _placeOrder() async {
+    if (uid == null) return;
+
+    final cartRef = _firestore.collection('users').doc(uid).collection('cart');
+    final orderRef =
+        _firestore.collection('users').doc(uid).collection('orders');
+
+    final cartItems = await cartRef.get();
+
+    if (cartItems.docs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sepetiniz boş, sipariş oluşturulamadı ❌')),
+      );
+      return;
+    }
+
+    List<Map<String, dynamic>> orderItems = [];
+
+    for (var doc in cartItems.docs) {
+      final data = doc.data();
+      orderItems.add({
+        'name': data['name'],
+        'price': data['price'],
+        'quantity': data['quantity'],
+        'imageUrl': data['imageUrl'],
+      });
+    }
+
+    try {
+      await orderRef.add({
+        'createdAt': FieldValue.serverTimestamp(), // 🔥 Sipariş zamanı
+        'items': orderItems,
+      });
+
+      for (var doc in cartItems.docs) {
+        await doc.reference.delete(); // 🔥 Sepeti temizle
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sipariş kaydedildi ve sepet temizlendi ✅')),
+      );
+    } catch (e) {
+      print('Sipariş oluşturma hatası: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sipariş oluşturulamadı ❌')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (uid == null) {
-      return Scaffold(body: Center(child: Text('Kullanıcı girişi yapılmamış')));
+      return Scaffold(
+        appBar: AppBar(title: Text('Sepetim')),
+        body: Center(child: Text('Giriş yapılmamış')),
+      );
     }
 
     return Scaffold(
@@ -114,64 +166,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  if (uid == null) return;
-
-                  final cartRef = _firestore
-                      .collection('users')
-                      .doc(uid)
-                      .collection('cart');
-                  final orderRef = _firestore
-                      .collection('users')
-                      .doc(uid)
-                      .collection('orders');
-
-                  final cartItems = await cartRef.get();
-
-                  if (cartItems.docs.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text('Sepetiniz boş, sipariş oluşturulamadı ❌')),
-                    );
-                    return;
-                  }
-
-                  List<Map<String, dynamic>> orderItems = [];
-
-                  for (var doc in cartItems.docs) {
-                    final data = doc.data();
-                    orderItems.add({
-                      'name': data['name'],
-                      'price': data['price'],
-                      'quantity': data['quantity'],
-                      'imageUrl': data['imageUrl'],
-                    });
-                  }
-
-                  try {
-                    await orderRef.add({
-                      'createdAt': FieldValue.serverTimestamp(),
-                      'items': orderItems,
-                    });
-
-                    for (var doc in cartItems.docs) {
-                      await doc.reference.delete();
-                    }
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text('Sipariş başarıyla oluşturuldu ✅')),
-                    );
-                  } catch (e) {
-                    print('Sipariş hatası: $e');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text('Sipariş oluşturulurken hata oluştu ❌')),
-                    );
-                  }
-                },
+                onPressed: _placeOrder,
                 child: Text('Satın Al'),
               ),
               SizedBox(height: 16),
