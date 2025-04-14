@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopware/screens/forgot_password_screen.dart';
 
 import 'register_screen.dart';
 import 'home_screen.dart';
@@ -76,6 +77,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
               },
               child: Text('Hesabın yok mu? Kayıt ol'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ForgotPasswordScreen()),
+                );
+              },
+              child: Text('Şifremi Unuttum'),
             ),
           ],
         ),
