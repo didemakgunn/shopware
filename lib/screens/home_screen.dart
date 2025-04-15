@@ -3,10 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopware/screens/admin_order_panel.dart';
 import 'package:shopware/screens/cart_screen.dart';
-import 'package:shopware/screens/favorite_products_screen.dart';
 import 'package:shopware/screens/order_history_screen.dart';
 import 'package:shopware/screens/product_screen.dart';
-
 import 'login_screen.dart';
 import 'profile_screen.dart';
 import 'admin_product_screen.dart';
@@ -22,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
 
+  int _selectedIndex = 0;
   bool _isAdmin = false;
 
   @override
@@ -57,112 +56,114 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = _auth.currentUser;
 
+    final screens = [
+      ProductScreen(),
+      CartScreen(),
+      OrderHistoryScreen(),
+      user == null ? LoginScreen() : ProfileScreen(),
+    ];
+
+    Widget _buildNavIcon(IconData icon, int index) {
+      final isSelected = _selectedIndex == index;
+      return Container(
+        padding: EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: isSelected ? 28 : 24,
+          color: isSelected ? Colors.blueAccent : Colors.grey,
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ana Sayfa'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () => _logout(context),
-            tooltip: 'Çıkış Yap',
-          ),
+          if (user != null)
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () => _logout(context),
+              tooltip: 'Çıkış Yap',
+            ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Hoş geldin, ${user?.email ?? 'Kullanıcı'}!',
-              style: TextStyle(fontSize: 20),
+      body: screens[_selectedIndex],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, -1),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => ProfileScreen()),
-                );
-              },
-              child: Text('Profilim'),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) => setState(() => _selectedIndex = index),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Colors.blueAccent,
+          unselectedItemColor: Colors.grey[500],
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w400),
+          showUnselectedLabels: false,
+          items: [
+            BottomNavigationBarItem(
+              icon: _buildNavIcon(Icons.store, 0),
+              label: 'Ürünler',
             ),
-            SizedBox(
-              height: 20,
+            BottomNavigationBarItem(
+              icon: _buildNavIcon(Icons.shopping_cart, 1),
+              label: 'Sepet',
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => ProductScreen()),
-                );
-              },
-              child: Text('Ürünleri Gör'),
+            BottomNavigationBarItem(
+              icon: _buildNavIcon(Icons.receipt_long, 2),
+              label: 'Sipariş',
             ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => FavoriteProductsScreen()),
-                );
-              },
-              child: Text('Favori Ürünlerim'),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            if (_isAdmin) ...[
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => AdminProductScreen()),
-                  );
-                },
-                child: Text('Admin Panel'),
+            BottomNavigationBarItem(
+              icon: _buildNavIcon(
+                _auth.currentUser == null ? Icons.login : Icons.person,
+                3,
               ),
-              SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => AdminOrderPanel()),
-                  );
-                },
-                child: Text('Sipariş Yönetimi'),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => CartScreen()),
-                );
-              },
-              child: Text('Sepetim'),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => OrderHistoryScreen()),
-                );
-              },
-              child: Text('Siparişlerim'),
+              label: _auth.currentUser == null ? 'Giriş' : 'Profil',
             ),
           ],
         ),
       ),
+      drawer: _isAdmin
+          ? Drawer(
+              child: ListView(
+                children: [
+                  DrawerHeader(
+                    decoration: BoxDecoration(color: Colors.blue),
+                    child: Text('Admin Panel',
+                        style: TextStyle(color: Colors.white, fontSize: 20)),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.inventory),
+                    title: Text('Ürün Yönetimi'),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => AdminProductScreen()),
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.assignment),
+                    title: Text('Sipariş Yönetimi'),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => AdminOrderPanel()),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : null,
     );
   }
 }

@@ -80,20 +80,10 @@ class _ProductScreenState extends State<ProductScreen> {
               final productId = doc.id;
               final isFav = _favoriteProductIds.contains(productId);
 
-              return Card(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading:
-                      Image.network(data['imageUrl'], width: 50, height: 50),
-                  title: Text(data['name']),
-                  subtitle: Text('${data['price']} ₺'),
-                  trailing: IconButton(
-                    icon: Icon(
-                      isFav ? Icons.favorite : Icons.favorite_border,
-                      color: isFav ? Colors.red : null,
-                    ),
-                    onPressed: () => _toggleFavorite(productId),
-                  ),
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
@@ -105,6 +95,72 @@ class _ProductScreenState extends State<ProductScreen> {
                       ),
                     );
                   },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(16)),
+                          child: Image.network(
+                            data['imageUrl'],
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['name'],
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  '${data['price'].toString()} ₺',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.green[700],
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  data['description'] ?? '',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: isFav ? Colors.red : Colors.grey,
+                          ),
+                          onPressed: () => _toggleFavorite(productId),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
