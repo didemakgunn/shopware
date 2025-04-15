@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shopware/snackbar_helper.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
@@ -86,10 +87,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'quantity': 1,
       });
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Sepete eklendi')),
-    );
+    showShortSnack(context, '✅ Sepete eklendi');
   }
 
   @override

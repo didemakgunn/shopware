@@ -5,6 +5,7 @@ import 'package:shopware/screens/admin_order_panel.dart';
 import 'package:shopware/screens/cart_screen.dart';
 import 'package:shopware/screens/order_history_screen.dart';
 import 'package:shopware/screens/product_screen.dart';
+import 'package:shopware/screens/favorite_products_screen.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
 import 'admin_product_screen.dart';
@@ -58,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final screens = [
       ProductScreen(),
+      FavoriteProductsScreen(),
       CartScreen(),
       OrderHistoryScreen(),
       user == null ? LoginScreen() : ProfileScreen(),
@@ -118,17 +120,21 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Ürünler',
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.shopping_cart, 1),
+              icon: _buildNavIcon(Icons.favorite, 1),
+              label: 'Favoriler',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildNavIcon(Icons.shopping_cart, 2),
               label: 'Sepet',
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.receipt_long, 2),
+              icon: _buildNavIcon(Icons.receipt_long, 3),
               label: 'Sipariş',
             ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(
                 _auth.currentUser == null ? Icons.login : Icons.person,
-                3,
+                4,
               ),
               label: _auth.currentUser == null ? 'Giriş' : 'Profil',
             ),

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shopware/snackbar_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -96,9 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _profileImageUrl = imageUrl ?? _profileImageUrl;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Profil güncellendi')),
-    );
+    showShortSnack(context, 'Profil güncellendi');
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shopware/snackbar_helper.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -52,9 +53,7 @@ class _CartScreenState extends State<CartScreen> {
     final cartItems = await cartRef.get();
 
     if (cartItems.docs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sepetiniz boş, sipariş oluşturulamadı ❌')),
-      );
+      showShortSnack(context, 'Sepetiniz boş, sipariş oluşturulamadı ❌');
       return;
     }
 
@@ -72,22 +71,18 @@ class _CartScreenState extends State<CartScreen> {
 
     try {
       await orderRef.add({
-        'createdAt': FieldValue.serverTimestamp(), // 🔥 Sipariş zamanı
+        'createdAt': FieldValue.serverTimestamp(),
         'items': orderItems,
       });
 
       for (var doc in cartItems.docs) {
-        await doc.reference.delete(); // 🔥 Sepeti temizle
+        await doc.reference.delete();
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sipariş kaydedildi ve sepet temizlendi ✅')),
-      );
+      showShortSnack(context, 'Sipariş kaydedildi ve sepet temizlendi ✅');
     } catch (e) {
       print('Sipariş oluşturma hatası: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sipariş oluşturulamadı ❌')),
-      );
+      showShortSnack(context, 'Sipariş oluşturulamadı ❌');
     }
   }
 
