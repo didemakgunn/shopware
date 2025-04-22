@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shopware/snackbar_helper.dart';
+import 'package:shopware/helpers/snackbar_helper.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
@@ -47,7 +47,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   void _toggleFavorite() async {
     final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+    if (uid == null) {
+      showShortSnack(context, '🔐 Önce giriş yapmalısınız');
+      return;
+    }
 
     final favRef = _firestore
         .collection('users')
@@ -58,15 +61,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     if (_isFavorite) {
       await favRef.delete();
       setState(() => _isFavorite = false);
+      showShortSnack(context, '❌ Favorilerden çıkarıldı');
     } else {
       await favRef.set({'addedAt': FieldValue.serverTimestamp()});
       setState(() => _isFavorite = true);
+      showShortSnack(context, '❤️ Favorilere eklendi');
     }
   }
 
   void _addToCart() async {
     final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+    if (uid == null) {
+      showShortSnack(context, '🔐 Önce giriş yapmalısınız');
+      return;
+    }
 
     final cartRef = _firestore
         .collection('users')
@@ -87,7 +95,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'quantity': 1,
       });
     }
-    showShortSnack(context, '✅ Sepete eklendi');
+    showShortSnack(context, '🛒 Sepete eklendi');
   }
 
   @override

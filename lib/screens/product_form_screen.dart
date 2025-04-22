@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shopware/helpers/snackbar_helper.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final String? productId;
@@ -53,12 +54,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           .collection('products')
           .doc(widget.productId)
           .update(productData);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Ürün güncellendi')));
+      showShortSnack(context, 'Ürün güncellendi');
     } else {
       await _firestore.collection('products').add(productData);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Ürün eklendi')));
+      showShortSnack(context, 'Ürün eklendi');
     }
 
     Navigator.pop(context);

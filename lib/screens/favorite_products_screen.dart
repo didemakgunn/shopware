@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shopware/helpers/snackbar_helper.dart';
 import 'package:shopware/screens/product_detail_screen.dart';
 
 class FavoriteProductsScreen extends StatefulWidget {
@@ -65,9 +66,7 @@ class _FavoriteProductsScreenState extends State<FavoriteProductsScreen> {
         .doc(productId)
         .delete();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Favorilerden kaldırıldı')),
-    );
+    showShortSnack(context, '❌ Favorilerden çıkarıldı');
 
     _loadFavorites();
   }

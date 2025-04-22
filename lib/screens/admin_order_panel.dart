@@ -19,8 +19,9 @@ class _AdminOrderPanelState extends State<AdminOrderPanel> {
       body: FutureBuilder<QuerySnapshot>(
         future: _firestore.collection('users').get(),
         builder: (context, userSnapshot) {
-          if (!userSnapshot.hasData)
+          if (!userSnapshot.hasData) {
             return Center(child: CircularProgressIndicator());
+          }
 
           final userDocs = userSnapshot.data!.docs;
 

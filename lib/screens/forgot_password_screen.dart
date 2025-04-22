@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shopware/helpers/snackbar_helper.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -16,23 +17,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final email = _emailController.text.trim();
 
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lütfen e-posta adresinizi girin')),
-      );
+      showShortSnack(context, 'Lütfen e-posta adresinizi girin');
+
       return;
     }
 
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Şifre sıfırlama bağlantısı gönderildi ✅')),
-      );
+      showShortSnack(context, 'Şifre sıfırlama bağlantısı gönderildi ✅');
+
       Navigator.pop(context);
     } catch (e) {
       print('Şifre sıfırlama hatası: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bir hata oluştu: ${e.toString()}')),
-      );
+      showShortSnack(context, 'Bir hata oluştu: ${e.toString()}');
     }
   }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'product_detail_screen.dart';
+import 'package:shopware/screens/product_detail_screen.dart';
+import 'package:shopware/helpers/snackbar_helper.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -14,7 +14,8 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
-  Set<String> _favoriteProductIds = {};
+
+  Set<String> _favoriteIds = {};
 
   @override
   void initState() {
@@ -22,41 +23,42 @@ class _ProductScreenState extends State<ProductScreen> {
     _loadFavorites();
   }
 
-  void _loadFavorites() async {
+  Future<void> _loadFavorites() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
 
-    final snapshot = await _firestore
+    final favSnap = await _firestore
         .collection('users')
         .doc(uid)
         .collection('favorites')
         .get();
 
     setState(() {
-      _favoriteProductIds = snapshot.docs.map((doc) => doc.id).toSet();
+      _favoriteIds = favSnap.docs.map((d) => d.id).toSet();
     });
   }
 
-  void _toggleFavorite(String productId) async {
+  Future<void> _toggleFavorite(String productId) async {
     final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
+    if (uid == null) {
+      showShortSnack(context, '🔐 Önce giriş yapmalısınız');
+      return;
+    }
     final favRef = _firestore
         .collection('users')
         .doc(uid)
         .collection('favorites')
         .doc(productId);
 
-    if (_favoriteProductIds.contains(productId)) {
+    final isFav = _favoriteIds.contains(productId);
+    if (isFav) {
       await favRef.delete();
-      setState(() {
-        _favoriteProductIds.remove(productId);
-      });
+      setState(() => _favoriteIds.remove(productId));
+      showShortSnack(context, '❌ Favorilerden çıkarıldı');
     } else {
       await favRef.set({'addedAt': FieldValue.serverTimestamp()});
-      setState(() {
-        _favoriteProductIds.add(productId);
-      });
+      setState(() => _favoriteIds.add(productId));
+      showShortSnack(context, '❤️ Favorilere eklendi');
     }
   }
 
@@ -67,18 +69,24 @@ class _ProductScreenState extends State<ProductScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('products').snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (snapshot.hasError) {
+            return Center(child: Text('Bir hata oluştu.'));
+          }
+          if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
-
+          }
           final docs = snapshot.data!.docs;
-
+          if (docs.isEmpty) {
+            return Center(child: Text('Henüz ürün yok.'));
+          }
           return ListView.builder(
+            padding: EdgeInsets.symmetric(vertical: 12),
             itemCount: docs.length,
             itemBuilder: (context, index) {
               final doc = docs[index];
               final data = doc.data() as Map<String, dynamic>;
               final productId = doc.id;
-              final isFav = _favoriteProductIds.contains(productId);
+              final isFav = _favoriteIds.contains(productId);
 
               return Padding(
                 padding:
@@ -101,10 +109,9 @@ class _ProductScreenState extends State<ProductScreen> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
+                            color: Colors.black12,
+                            blurRadius: 8,
+                            offset: Offset(0, 4))
                       ],
                     ),
                     child: Row(
@@ -113,10 +120,14 @@ class _ProductScreenState extends State<ProductScreen> {
                           borderRadius: BorderRadius.horizontal(
                               left: Radius.circular(16)),
                           child: Image.network(
-                            data['imageUrl'],
+                            data['imageUrl'] ?? '',
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey[200]),
                           ),
                         ),
                         Expanded(
@@ -126,14 +137,14 @@ class _ProductScreenState extends State<ProductScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  data['name'],
+                                  data['name'] ?? 'Ürün adı yok',
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600),
                                 ),
                                 SizedBox(height: 6),
                                 Text(
-                                  '${data['price'].toString()} ₺',
+                                  '${(data['price'] ?? 0).toStringAsFixed(2)} ₺',
                                   style: TextStyle(
                                       fontSize: 15,
                                       color: Colors.green[700],
