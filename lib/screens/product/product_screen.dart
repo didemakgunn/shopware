@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shopware/screens/product_detail_screen.dart';
+import 'package:shopware/screens/product/product_detail_screen.dart';
 import 'package:shopware/helpers/snackbar_helper.dart';
 
 class ProductScreen extends StatefulWidget {

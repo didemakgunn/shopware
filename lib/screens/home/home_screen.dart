@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shopware/screens/admin_order_panel.dart';
-import 'package:shopware/screens/cart_screen.dart';
-import 'package:shopware/screens/order_history_screen.dart';
-import 'package:shopware/screens/product_screen.dart';
-import 'package:shopware/screens/favorite_products_screen.dart';
-import 'login_screen.dart';
-import 'profile_screen.dart';
-import 'admin_product_screen.dart';
+import 'package:shopware/screens/admin/admin_order_panel.dart';
+import 'package:shopware/screens/cart/cart_screen.dart';
+import 'package:shopware/screens/order/order_history_screen.dart';
+import 'package:shopware/screens/product/product_screen.dart';
+import 'package:shopware/screens/cart/favorite_products_screen.dart';
+import '../auth/login_screen.dart';
+import '../profile/profile_screen.dart';
+import '../admin/admin_product_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

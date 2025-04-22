@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopware/helpers/snackbar_helper.dart';
 
-import 'product_form_screen.dart';
+import '../product/product_form_screen.dart';
 
 class AdminProductScreen extends StatelessWidget {
   const AdminProductScreen({super.key});

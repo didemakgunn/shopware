@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shopware/screens/forgot_password_screen.dart';
+import 'package:shopware/screens/auth/forgot_password_screen.dart';
 
 import 'register_screen.dart';
-import 'home_screen.dart';
+import '../home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
